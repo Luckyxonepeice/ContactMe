@@ -1,12 +1,12 @@
 const express = require('express');
 const {check} = require('../backend/middleware/Auth')
-require('./utils/mongoConnect');
+require('./db/mongoConnect');
 
 const app = express();
 
-app.get('/',(req,res)=>{
-    res.send("Server is Active");
-});
+app.use(express.json());
+
+app.use("/api",require('./router/auth'));
 
 app.get('/about', check, (req,res)=>{
     res.send("About Me Page!");
