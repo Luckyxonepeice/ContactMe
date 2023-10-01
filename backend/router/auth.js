@@ -2,7 +2,7 @@
 const express= require('express');
 const router = express.Router();
 const User = require("../modals/userSchema");
-const { check } = require('../middleware/Auth');
+const { check,credentials } = require('../middleware/Auth');
 
 router.get('/',(req,res)=>{
     res.send("Server is Active");
@@ -31,4 +31,29 @@ router.post('/register', check, async (req,res) => {
     });
 
 })
+
+router.post('/login', credentials, async (req,res)=>{
+
+    const {email,password} = req.body;
+
+    const user = await User.findOne({email});
+
+    if(!user){
+        return res.send({
+            message:"Invalide Credentials!!"
+        })
+    }
+
+    if(user.password.localeCompare(password)===0){
+        return res.send({
+            message:"Invalide Credentials!!"
+        })
+    }
+
+    res.send({
+        message:"Successfully Login!!"
+    })
+
+})
+
 module.exports= router;
