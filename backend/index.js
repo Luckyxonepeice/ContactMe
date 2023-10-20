@@ -6,9 +6,9 @@ const app = express();
 
 app.use(express.json());
 
-app.use("/api",require('./router/auth'));
+app.use("/auth",require('./router/auth'));
 
-app.get('/about', check, (req,res)=>{
+app.get('/about', (req,res)=>{
     res.send("About Me Page!");
 })
 

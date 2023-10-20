@@ -1,6 +1,7 @@
 
 const express= require('express');
 const router = express.Router();
+const bcrypt = require('bcryptjs');
 const User = require("../modals/userSchema");
 const { check,credentials } = require('../middleware/Auth');
 
@@ -22,7 +23,9 @@ router.post('/register', check, async (req,res) => {
 
     const user = new User({
         name,email,phone,work,password
-    })
+    });
+
+    
 
     await user.save();
 
@@ -34,21 +37,35 @@ router.post('/register', check, async (req,res) => {
 
 router.post('/login', credentials, async (req,res)=>{
 
+    let token;
     const {email,password} = req.body;
 
     const user = await User.findOne({email});
 
     if(!user){
+        console.log("Email");
         return res.send({
             message:"Invalide Credentials!!"
         })
     }
 
-    if(user.password.localeCompare(password)===0){
+    const match = await bcrypt.compare(password,user.password);
+
+
+    if(!match){
+        console.log("Password");
         return res.send({
             message:"Invalide Credentials!!"
         })
     }
+
+    //For Generating Token
+    token = await user.generateAuthToken();
+    
+    res.cookie("token",token,{
+        expires:new Date(Date.now()+2500000000),
+        httpOnly:true
+    });
 
     res.send({
         message:"Successfully Login!!"
